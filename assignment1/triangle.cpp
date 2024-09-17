@@ -5,10 +5,10 @@
 using namespace std;
 
 int main() {
-    double x1, y1, x2, y2, x3, y3;
-    double area=0;
-    string input; 
-    bool go= true;
+    double x1, y1, x2, y2, x3, y3; // points
+    double area=0; // area
+    string input; // first intake
+    bool go= true; // boolean to keep loop going
 
     while (go){
         cout << "Enter the 3 points of the triangle where each x and y coordinate is separated by whitespace." << endl;
@@ -22,9 +22,16 @@ int main() {
             go =false;
             break;
         }
-        else{
+        /*else{
+            x1= stod(input);
+        }*/
+         try{
             x1= stod(input);
         }
+        catch(...){
+            cout << "Error: Invalid input" << endl;
+            return 1;
+        } 
 
         // clear previous errors for future loops
         cin.clear();
@@ -38,6 +45,7 @@ int main() {
         }
         else{
             area = (0.5)*abs(x1*(y2-y3) + x2*(y3-y1) + x3*(y1-y2));
+            cout << x1 << ", "<< y1 << "   " << x2 << ", "<< y2 << "   " << x3 << ", "<< y3 << endl;
             cout << "The area of the triangle is: " << area << endl;
             go = false;
             break;
