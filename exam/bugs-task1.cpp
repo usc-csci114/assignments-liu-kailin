@@ -62,8 +62,6 @@ int parseCSV(const string& filePath, map<string, vector<double>>& lightData) {
 
         // Add data to the map
         string lightType = row[lightIndex];
-        double
-        
 
         // Accumulate values for each light type (lightData[lightType] = key / string)
         int order=0; // track the location  in the vector that correspondes with the order
@@ -77,7 +75,7 @@ int parseCSV(const string& filePath, map<string, vector<double>>& lightData) {
     }
     file.close();
     
-    return endIndex-startIndex+1; // return number of orders
+    return endIndex-startIndex; // return number of orders
 }
 
 

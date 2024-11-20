@@ -75,12 +75,12 @@ void parseCSV(const string& filePath, Site& URBAN, Site& RURAL) {
         // Add data to the corresponding site
         
         if(row[siteIndex] == "BG"){
-            URBAN.Standardized_Moon.push_back(row[moonIndex]);
-            URBAN.Standardized_Moon.push_back(row[totalIndex]);
+            URBAN.Standardized_Moon.push_back(stod(row[moonIndex]));
+            URBAN.Standardized_Moon.push_back(stod(row[totalIndex]));
         }
         else if (row[siteIndex] == "LK" || row[siteIndex] == "Stunt"){
-            RURAL.Standardized_Moon.push_back(row[moonIndex]);
-            RURAL.Standardized_Moon.push_back(row[totalIndex]);
+            RURAL.Standardized_Moon.push_back(stod(row[moonIndex]));
+            RURAL.Standardized_Moon.push_back(stod(row[totalIndex]));
         }
 
     }
@@ -107,16 +107,16 @@ int main() {
     // plot BG
     plot(urban.Standardized_Moon, urban.total, "rx");
     hold(on);
-    vector<double> trend_x = linspace(2.2, 4.0, 10);
-    vector<double> trend_y = transform(trend_x, [](auto x) {return 240.5*x + 1043;});
+    //vector<double> trend_x = linspace(2.2, 4.0, 10);
+    //vector<double> trend_y = transform(trend_x, [](auto x) {return 240.5*x + 1043;});
     show();
     save("urban-BG.svg");
     
     // plot LK and Stunt
     plot(rural.Standardized_Moon, rural.total, "rx");
     hold(on);
-    vector<double> trend_x = linspace(2.2, 4.0, 10);
-    vector<double> trend_y = transform(trend_x, [](auto x) {return 240.5*x + 1043;});
+    //vector<double> trend_x = linspace(2.2, 4.0, 10);
+    //vector<double> trend_y = transform(trend_x, [](auto x) {return 240.5*x + 1043;});
     show();
     save("rural-LK-Stunt.svg");
 
