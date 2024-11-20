@@ -93,7 +93,6 @@ int main(){
         if (guess.length() != 5){
             cout << "Guess does not have 5 characters, please try again:" << endl;
             cin >> guess;
-            
         }
 
         // loop for 6 tries
