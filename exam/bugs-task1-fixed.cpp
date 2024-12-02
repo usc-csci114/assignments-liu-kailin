@@ -65,7 +65,7 @@ void parseCSV(const string &filePath, map<string, vector<double>> &lightData, ve
             }
 
             if (lightIndex == -1 || startIndex == -1 || endIndex == -1) {
-                cerr << "Error: Missing required columns in the CSV file." << endl;
+                cout << "Error: Missing required columns in the CSV file." << endl;
                 return;
             }
 
@@ -119,7 +119,7 @@ int main() {
     parseCSV(filePath, lightData, orderNames);
 
     /*if (orderNames.empty() || lightData.empty()) {
-        cerr << "Error: No data to process. Check the input file." << endl;
+        cout << "Error: No data to process. Check the input file." << endl;
         return 1;
     }*/
 
@@ -133,7 +133,7 @@ int main() {
 
         for (const auto& entry : lightData) {
             if (i >= entry.second.size()) {
-                cerr << "Error: Inconsistent data size for light type " << entry.first << endl;
+                cout << "Error: Inconsistent data size for light type " << entry.first << endl;
                 return 1;
             }
 

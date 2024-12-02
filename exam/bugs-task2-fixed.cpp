@@ -159,7 +159,7 @@ int main() {
     ylabel("Total Bugs");
     title("Rural Sites (LK & Stunt)");
     show();
-    save("combined.png");
+    save("combined-scatter.png");
 
     return 0;
 }
