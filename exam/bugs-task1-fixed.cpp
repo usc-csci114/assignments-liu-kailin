@@ -27,11 +27,11 @@ void parseCSV(const string &filePath, map<string, vector<double>> &lightData, ve
     int lightIndex = -1, startIndex = -1, endIndex = -1;
 
     // Read the file
-    int rownum =0; 
+    //int rownum =0; 
     while (getline(file, line)) {
 
-        cout << "Processing row " << rownum << endl;
-        rownum++;
+        //cout << "Processing row " << rownum << endl;
+        //rownum++;
 
         stringstream ss(line);
         string cell;
@@ -56,7 +56,7 @@ void parseCSV(const string &filePath, map<string, vector<double>> &lightData, ve
 
                 if (row[i] == lt) {
                     lightIndex = i;
-                    cout << "light found " << endl;
+                    //cout << "light found " << endl;
                 } else if (row[i] == "Diptera") {
                     startIndex = i;
                 } else if (row[i] == "Total") {
@@ -81,7 +81,7 @@ void parseCSV(const string &filePath, map<string, vector<double>> &lightData, ve
         // Skip rows with missing data
         if (!isFirstLine){
             // Add data to the map
-            cout << "ran past firstline" << endl; 
+            //cout << "ran past firstline" << endl; 
             string lightType = row[lightIndex];
 
             // intialize map if first time --> is there a better way to check this (the logic doesn't really click for me)
@@ -103,7 +103,7 @@ void parseCSV(const string &filePath, map<string, vector<double>> &lightData, ve
 
 int main() {
     // File path
-    string filePath = "bug-attraction.csv";
+    string filePath = "bug-attraction-goodney.csv";
 
     // Map to store light type and insect counts
     map<string, vector<double>> lightData;
@@ -127,7 +127,7 @@ int main() {
     vector<string> bestLight(orderNames.size());
     
     for (size_t i = 0; i < orderNames.size(); i++) {
-        cout << "RUNNING " << orderNames[i] << endl;
+        //cout << "RUNNING " << orderNames[i] << endl;
         string bestLightType = "NA";
         double maxCount = 0;
 
@@ -137,7 +137,7 @@ int main() {
                 return 1;
             }
 
-           cout << "Looking at Light Type " << entry.first << endl;
+           //cout << "Looking at Light Type " << entry.first << endl;
             
             if (entry.second[i] > maxCount) {
                 maxCount = entry.second[i];
@@ -147,7 +147,7 @@ int main() {
         }
 
         bestLight[i] = bestLightType;
-        cout << endl;
+        // cout << endl;
         //cout << "For " << orderNames[i] << "Best light is: " << bestLight[i] << endl;
     }
 
@@ -160,3 +160,5 @@ int main() {
 
     return 0;
 }
+
+// clang++ -Wall -std=c++11 bugs-task1-fixed.cpp -o task1 -g
