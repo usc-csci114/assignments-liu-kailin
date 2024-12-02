@@ -12,6 +12,8 @@
 using namespace matplot;
 using namespace std;
 
+// working on seg fault error
+
 void parseCSV(const string &filePath, map<string, vector<double>> &orderData, vector<string> &lightTypes, vector<string> &orderNames) {
     
     ifstream file(filePath);
