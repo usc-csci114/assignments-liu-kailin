@@ -97,11 +97,11 @@ int main() {
     vector<string> orderNames; // Insect order names
     map<string, vector<double>> orderData; // Map to store counts for each order by light type
 
-    // Parse the CSV file
+    // Parse data
     parseCSV(filePath, orderData, lightTypes, orderNames);
 
 
-    // Step 1: Identify the top 4 most common insect orders overall
+    // Step 1: Find top 4 most common insect orders overall
 
     priority_queue<pair<double, string>> pq; // Priority queue to track the top orders
 
@@ -121,7 +121,7 @@ int main() {
     }
 
 
-    // Step 2: Gather counts for the top 4 orders by light type
+    // Step 2: Get counts for the top 4 orders by light type
 
     vector<vector<double>> groupedData(4, vector<double>(6, 0.0)); // Store counts for each top order
     for (size_t i = 0; i < 4; i++) {
@@ -130,7 +130,7 @@ int main() {
     }
 
 
-    // Step 3: Prepare x-axis positions for grouped bar chart
+    // Step 3: Prep x-axis positions for grouped bar chart
 
     size_t numOrders = 4; // Number of top orders
     size_t numLightTypes = 6; // Number of light types
@@ -158,7 +158,7 @@ int main() {
     }
 
 
-    // Step 4: Plot the grouped bar chart
+    // Step 4: Plot bar chart
 
     for (size_t i = 0; i < numOrders; i++) { // Plot each set of bars for the top 4 orders
         bar(barX[i], groupedData[i]); 

@@ -129,13 +129,10 @@ int main() {
 
     // plot BG
     auto fig1 = figure(true);
-    //auto ax1 = fig1->add_subplot(1, 3, 1);
-    // scatter plot using red xs
+
     plot(urban.Standardized_Moon, urban.total, "rx");
     hold(on);
     // regression line
-    //vector<double> trend_x = linspace(2.2, 4.0, 10);
-    //vector<double> trend_y = transform(trend_x, [](auto x) {return 240.5*x + 1043;});
     plot(urban.Standardized_Moon, urbanFit, "r-");
     //matplot::legend({"Data Points", "Regression Line"});
     // labels
@@ -145,14 +142,12 @@ int main() {
 
     show();
     hold(on);
-    //save("urban-BG.png");  
+    //save("urban-BG.png");
 
 
     // plot LK and Stunt
 
     // scatter plot using blue xs
-    //auto fig2 = figure(true);
-    //auto ax2 = fig1->add_subplot(1, 3, 2);
     plot(rural.Standardized_Moon, rural.total, "bx");
     hold(on);
     // regression line

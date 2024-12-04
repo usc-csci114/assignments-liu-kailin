@@ -18,7 +18,7 @@ void parseCSV(const string &filePath, map<string, vector<double>> &lightData, ve
     ifstream file(filePath);
 
     if (!file.is_open()) {
-        cerr << "Error opening file!" << endl;
+        cout << "Error opening file!" << endl;
         return;
     }
 
@@ -109,19 +109,11 @@ int main() {
     map<string, vector<double>> lightData;
 
     // Vector to store order names
-    /*vector<string> orderNames ={"Diptera", "Hymenoptera", "Hemiptera", "Psocoptera",
-                                "Coleoptera", "Collembola", "Arachnid", "Thysanura",
-                                "Isoptera", "Lepidoptera", "Neuroptera", "Larave",
-                                "Orthoptera", "Unident"};*/
     vector<string> orderNames;
 
     // Parse data
     parseCSV(filePath, lightData, orderNames);
 
-    /*if (orderNames.empty() || lightData.empty()) {
-        cout << "Error: No data to process. Check the input file." << endl;
-        return 1;
-    }*/
 
     // Determine the most attractive light type for each order
     vector<string> bestLight(orderNames.size());
