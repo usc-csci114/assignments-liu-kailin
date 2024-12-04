@@ -8,14 +8,11 @@
 #include <algorithm>
 #include <matplot/matplot.h>
 
-
 using namespace matplot;
 using namespace std;
 
-// working on seg fault error
-
+// Function to parse CSV and populate order data
 void parseCSV(const string &filePath, map<string, vector<double>> &orderData, vector<string> &lightTypes, vector<string> &orderNames) {
-    
     ifstream file(filePath);
 
     if (!file.is_open()) {
@@ -33,17 +30,17 @@ void parseCSV(const string &filePath, map<string, vector<double>> &orderData, ve
         string cell;
         vector<string> row;
 
-        // Parse the row
+        // Parse each line into individual cells
         while (getline(ss, cell, ',')) {
             row.push_back(cell);
         }
 
-        // Process headers to find the index of relevant columns
+        // Process the header row to determine column indices
         if (isFirstLine) {
             for (size_t i = 0; i < row.size(); i++) {
                 if (row[i] == "Light Type") {
                     lightIndex = i;
-                } else if (row[i] == "Diptera") { // Assuming the first insect order is Diptera
+                } else if (row[i] == "Diptera") { // Assume "Diptera" is the first insect order column
                     startIndex = i;
                 } else if (row[i] == "Total") {
                     endIndex = i;
@@ -55,181 +52,129 @@ void parseCSV(const string &filePath, map<string, vector<double>> &orderData, ve
                 return;
             }
 
-            // Populate light types and order names from headers
+            // Populate order names based on header row
             for (int i = startIndex; i < endIndex; i++) {
                 orderNames.push_back(row[i]);
             }
-            for (size_t i = 0; i < lightIndex; i++) {
-                lightTypes.push_back(row[i]);
-            }
 
-            isFirstLine = false; // Headers processed
+            isFirstLine = false; // Mark header as processed
             continue;
         }
 
-        // Skip rows with missing data
+        // Process each data row
         string lightType = row[lightIndex];
-
-        // For each order, add the counts to the corresponding entry in the map
         for (int i = startIndex; i < endIndex; i++) {
             string order = orderNames[i - startIndex];
             double count = stod(row[i]);
-            
-            // Find the index within the map vector for the current light type using a for loop
+
+            // Determine the index of the light type
             int innerIndex = -1;
-            for (size_t i = 0; i < lightTypes.size(); ++i) {
-                if (lightTypes[i] == lightType) {
-                    innerIndex = i;
+            for (size_t j = 0; j < lightTypes.size(); j++) {
+                if (lightTypes[j] == lightType) {
+                    innerIndex = j;
                     break;
                 }
             }
 
-            // If lightType was found (lightIndex is not -1), add the count to the corresponding order
-            if (lightIndex != -1) {
-                // Make the vector if first time
+            // Add the count to the order data
+            if (innerIndex != -1) {
                 if (orderData.find(order) == orderData.end()) {
-                    orderData[order] = vector<double>(lightTypes.size(), 0.0);  // Initialize if not found
+                    orderData[order] = vector<double>(lightTypes.size(), 0.0);
                 }
-
-                // Add the count to the correct index for the current light type
                 orderData[order][innerIndex] += count;
             }
+        }
     }
 
     file.close();
-    }
 }
 
 int main() {
-     // File path
-    string filePath = "bug-attraction-goodney.csv"; 
+    string filePath = "bug-attraction-goodney.csv"; // CSV file path
 
-    // vectors store light types, order names, and the order data map (parallels for later)
-    vector<string> lightTypes;  //store the names of the light types
-    vector<string> orderNames;  // store the names of insect orders
-    
-    // Map of insect orders -> vector of counts by light type
-    map<string, vector<double>> orderData;  
+    // Vectors to store light types, order names, and order data
+    vector<string> lightTypes = {"A", "B", "C", "LED", "CFL", "No"}; // Light type names
+    vector<string> orderNames; // Insect order names
+    map<string, vector<double>> orderData; // Map to store counts for each order by light type
 
-    // Parse data
+    // Parse the CSV file
     parseCSV(filePath, orderData, lightTypes, orderNames);
 
-    // Find top 4
-    /* vector<double> totalCounts; // tally total counts by order
-    for (const auto &entry : orderData) {
 
-        if (entry.second[i] > maxCount) {
-            maxCount = entry.second[i];
-            bestLightType = entry.first;
-        } 
-    } */
+    // Step 1: Identify the top 4 most common insect orders overall
 
-    // Priority queue (max-heap) to store orders with their total counts (lab 5)
-    priority_queue<pair<double, string>> pq;
+    priority_queue<pair<double, string>> pq; // Priority queue to track the top orders
 
-    // Calculate total counts for each order and push to priority queue
-    for (const auto& entry : orderData) {
+    for (const auto &entry : orderData) { // Loop through all orders
         double totalCount = 0.0;
-        // sum counts across all light types
-        for (double count : entry.second) {
+        for (double count : entry.second) { // Sum counts for all light types for the order
             totalCount += count;
         }
-
-        pq.push({totalCount, entry.first});
+        pq.push({totalCount, entry.first}); // Add the order and total count to the priority queue
     }
 
-    // Vector to store  top 4 orders
-    vector<string> topOrders;
+    vector<string> topOrders; // Vector to store the top 4 orders
 
-    // Extract top 4 orders from the priority queue
-    for (int i = 0; i < 4 && !pq.empty(); ++i) {
-        // Get the top order (highest count)
-        auto top = pq.top();
-        
-        // Store the order in the vector
-        topOrders.push_back(top.second);
-        
-        // Remove the top element from the priority queue
-        pq.pop();
+    for (int i = 0; i < 4 && !pq.empty(); ++i) { // Extract the top 4 orders
+        topOrders.push_back(pq.top().second); // Save the order name
+        pq.pop(); // Remove the processed order from the queue
     }
 
-    // PLOT
 
-    // vectors for each of the top 4 orders
-    vector<double> order1Counts(lightTypes.size(), 0.0);
-    vector<double> order2Counts(lightTypes.size(), 0.0);
-    vector<double> order3Counts(lightTypes.size(), 0.0);
-    vector<double> order4Counts(lightTypes.size(), 0.0);
+    // Step 2: Gather counts for the top 4 orders by light type
 
-    // input data
-    for (int i = 0; i < topOrders.size(); ++i) {
-        const string& order = topOrders[i];
-        const vector<double>& counts = orderData[order];
-        
-        if (i == 0) {
-            order1Counts = counts;
-        } 
-        else if (i == 1) {
-            order2Counts = counts;
-        } 
-        else if (i == 2) {
-            order3Counts = counts;
-        } 
-        else if (i == 3) {
-            order4Counts = counts;
+    vector<vector<double>> groupedData(4, vector<double>(6, 0.0)); // Store counts for each top order
+    for (size_t i = 0; i < 4; i++) {
+        const string &order = topOrders[i];
+        groupedData[i] = orderData[order]; // Assign the counts for each light type to the grouped data
+    }
+
+
+    // Step 3: Prepare x-axis positions for grouped bar chart
+
+    size_t numOrders = 4; // Number of top orders
+    size_t numLightTypes = 6; // Number of light types
+    double groupWidth = 0.8 ; // Total width for each group of bars
+    double barWidth = 0.1; // Width of each bar in a group
+    double spacing = 2.0; // Spacing between groups
+
+
+    vector<double> baseX; // Base positions for each light type group
+
+    for (size_t i = 0; i < numLightTypes; i++) {
+        baseX.push_back(i * spacing + 1); // Increment position with spacing
+    }
+
+    vector<vector<double>> barX(numOrders, vector<double>(numLightTypes)); // X positions for each bar
+
+    for (size_t i = 0; i < numOrders; i++) { // Loop through each top order
+        for (size_t j = 0; j < numLightTypes; j++) { // Loop through each light type
+            // Calculate bar position with offsets
+            barX[i][j] = baseX[j] - (groupWidth / 2) + (i + 0.8) * barWidth;
         }
     }
 
-    // Prepare x positions for each light type group
-    vector<double> x(lightTypes.size());
-    for (int i = 0; i < lightTypes.size(); ++i) {
-        x[i] = i + 1;
+
+    // Step 4: Plot the grouped bar chart
+
+    for (size_t i = 0; i < numOrders; i++) { // Plot each set of bars for the top 4 orders
+        bar(barX[i], groupedData[i]); 
+        hold(on);
     }
 
-    // Plot grouped bar chart
-    // Plot bars for each of the top 4 orders
-    bar(x, order1Counts);
-    for (auto& xi : x) {
-        xi += 0.2;
-    }  // Offset x for the next set of bars
-    hold(on);
-    
-    bar(x, order2Counts);
-    for (auto& xi : x) {
-        xi += 0.2;
-    }  // Offset x for the next set of bars
-    hold(on);
-    
-    bar(x, order3Counts);
-    for (auto& xi : x) {
-        xi += 0.2;
-    }  // Offset x for the next set of bars
-    hold(on);
-    
-    bar(x, order4Counts);
-    for (auto& xi : x) {
-        xi += 0.2;
-    }  // Offset x for the next set of bars
-    hold(on);
-    
-    // Label the x-axis with the light types
-    // xticks({1.0, 1.2, 1.4}, lightTypes);
-
-    title("Total Counts by Light Type and Order");
-    xlabel("Light Type");
+    // Adjust plot
+    xticks(baseX); // Set x-ticks to match light type positions
+    xticklabels(lightTypes); 
+    title("Total Counts by Light Type and Top 4 Insect Orders"); 
+    /*string topOrdersSubtitle = "Top 4 Orders: " + topOrders[0] + ", " + topOrders[1] + ", " + topOrders[2] + ", " + topOrders[3];
+    text(0.5, 0.9, topOrdersSubtitle, 
+        {{"horizontalalignment", "center"}, {"verticalalignment", "top"}, {"transform", "axes"}}); */
+    xlabel("Light Type"); 
     ylabel("Total Count");
+    // legend(topOrders); 
 
-    // Show the plot
     show();
-
-    // save plot
     save("barplot.png");
-
 
     return 0;
 }
-   
-
-
-
-// clang++ -g bugs-task3-INCOMPLETE.cpp -o task3fixed -std=c++17 -I/opt/homebrew/include -ldlib -lmatplot -lblas -L/opt/homebrew/lib
