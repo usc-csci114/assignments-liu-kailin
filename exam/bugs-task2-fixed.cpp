@@ -24,7 +24,7 @@ public:
 void parseCSV(const string& filePath, Site& URBAN, Site& RURAL) {
     ifstream file(filePath);
     if (!file.is_open()) {
-        cerr << "Error opening file!" << endl;
+        cout << "Error opening file!" << endl;
         return;
     }
 
@@ -112,8 +112,8 @@ int main() {
     parseCSV(filePath, urban, rural);
 
     // Calculate regression lines
-    std::pair<double, double> urbanRegression = calculateLinearRegression(urban.Standardized_Moon, urban.total);
-    std::pair<double, double> ruralRegression = calculateLinearRegression(rural.Standardized_Moon, rural.total);
+    pair<double, double> urbanRegression = calculateLinearRegression(urban.Standardized_Moon, urban.total);
+    pair<double, double> ruralRegression = calculateLinearRegression(rural.Standardized_Moon, rural.total);
 
     // Prep regression line values
     vector<double> urbanFit;
@@ -128,32 +128,36 @@ int main() {
 
 
     // plot BG
-
-    auto ax1 = fig->add_subplot(1, 3, 1);
+    auto fig1 = figure(true);
+    //auto ax1 = fig1->add_subplot(1, 3, 1);
     // scatter plot using red xs
-    matplot::plot(urban.Standardized_Moon, urban.total, "rx");
+    plot(urban.Standardized_Moon, urban.total, "rx");
     hold(on);
     // regression line
     //vector<double> trend_x = linspace(2.2, 4.0, 10);
     //vector<double> trend_y = transform(trend_x, [](auto x) {return 240.5*x + 1043;});
     plot(urban.Standardized_Moon, urbanFit, "r-");
+    //matplot::legend({"Data Points", "Regression Line"});
     // labels
     xlabel("Standardized Moon");
     ylabel("Total Bugs");
     title("Urban Site (BG)");
 
     show();
-    save("urban-BG.png");  
+    hold(on);
+    //save("urban-BG.png");  
 
 
     // plot LK and Stunt
 
     // scatter plot using blue xs
-    auto ax1 = fig->add_subplot(1, 3, 2);
-    matplot::plot(rural.Standardized_Moon, rural.total, "bx");
+    //auto fig2 = figure(true);
+    //auto ax2 = fig1->add_subplot(1, 3, 2);
+    plot(rural.Standardized_Moon, rural.total, "bx");
     hold(on);
     // regression line
     plot(rural.Standardized_Moon, ruralFit, "b-");  // Plot regression line
+    matplot::legend({"Data Points Urban", "Regression Line Urban", "Data Points Rural", "Regression Line Rural"});
     // labels
     xlabel("Standardized Moon");
     ylabel("Total Bugs");
@@ -166,5 +170,4 @@ int main() {
 
 // clang++ -Wall -std=c++11 bugs-task2-fixed.cpp -o task2 -g
 
-// clang++ -std=c++17 -I/opt/homebrew/include/ -L /opt/homebrew/lib -l matplot bugs-task2-fixed.cpp -o task2 -g
-
+// clang++ -g bugs-task2-fixed.cpp -o task2fixed -std=c++17 -I/opt/homebrew/include -ldlib -lmatplot -lblas -L/opt/homebrew/lib

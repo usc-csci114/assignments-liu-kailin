@@ -139,6 +139,9 @@ int main() {
     double spacing = 2.0; // Spacing between groups
 
 
+    // full discretion: for the offset I had to ask one of my CS friends
+    // thus the logic is not fully original, BUT they explained and we worked together 
+
     vector<double> baseX; // Base positions for each light type group
 
     for (size_t i = 0; i < numLightTypes; i++) {
@@ -171,10 +174,13 @@ int main() {
         {{"horizontalalignment", "center"}, {"verticalalignment", "top"}, {"transform", "axes"}}); */
     xlabel("Light Type"); 
     ylabel("Total Count");
-    // legend(topOrders); 
+    matplot::legend(topOrders); 
 
     show();
     save("barplot.png");
 
     return 0;
 }
+
+// clang++ -g bugs-task3-fixed.cpp -o task3fixed -std=c++17 -I/opt/homebrew/include -ldlib -lmatplot -lblas -L/opt/homebrew/lib
+
