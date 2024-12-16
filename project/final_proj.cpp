@@ -169,65 +169,66 @@ void parseCSV(const string &filePath, map<string, vector<double>> &countryData,
 }
 
 
-// Subset for top 5 and bottom 5 obesity rate countries
+// Subset for top 5 and bottom 5 metric rate countries
 void subsetCountries(const map<string, vector<double>> &countryData, const vector<string> &countryNames,
-                     const map<string, int> &columnIndices, vector<string> &topCountries, vector<string> &bottomCountries) {
+                     const map<string, int> &columnIndices, vector<string> &topCountries, vector<string> &bottomCountries, 
+                     string metric) {
+  
+  priority_queue<pair<double, string>> maxHeap; // Max-heap to store the top 5 countries
+  priority_queue<pair<double, string>, vector<pair<double, string>>, greater<pair<double, string>>> minHeap; // Min-heap to store the bottom 5 countries
+  
+  int metricIndex = columnIndices.at(metric); // Get index of the "metric" column
+  
+  // Loop through each country in the list of country names
+  for (const auto &country : countryNames) {
+    // Get metric rate using the index
+    double metricRate = countryData.at(country)[metricIndex];
     
-    priority_queue<pair<double, string>> maxHeap; // Max-heap to store the top 5 countries
-    priority_queue<pair<double, string>, vector<pair<double, string>>, greater<pair<double, string>>> minHeap; // Min-heap to store the bottom 5 countries
-
-    int obesityIndex = columnIndices.at("Obesity"); // Get index of the "Obesity" column
-
-    // Loop through each country in the list of country names
-    for (const auto &country : countryNames) {
-        // Get obesity rate using the index
-        double obesityRate = countryData.at(country)[obesityIndex];
-
-        // Push the country and its obesity rate into both heaps if obesity rate is valid
-        if (obesityRate != -1 && country != "Kiribati" && country != "Korea, North" && country != "Korea, South") { // exclude special cases
-            maxHeap.push({obesityRate, country});  // For max-heap (highest obesity rate)
-            minHeap.push({obesityRate, country});  // For min-heap (lowest obesity rate)
-        }
-
-        // If the size of the max-heap exceeds 5, remove the smallest (because it's max-heap, smallest value comes first)
+    // Push the country and its metric rate into both heaps if metric rate is valid
+    if (metricRate != -1 && country != "Kiribati" && country != "Korea, North" && country != "Korea, South") { // exclude special cases
+      maxHeap.push({metricRate, country});  // For max-heap (highest metric rate)
+      minHeap.push({metricRate, country});  // For min-heap (lowest metric rate)
+    }
+    
+    // If the size of the max-heap exceeds 5, remove the smallest (because it's max-heap, smallest value comes first)
         if (maxHeap.size() > 5) {
             maxHeap.pop(); 
         }
 
         // If the size of the min-heap exceeds 5, remove the largest (because it's min-heap, largest value comes first)
-        if (minHeap.size() > 5) {
-            minHeap.pop();
-        }
+    if (minHeap.size() > 5) {
+      minHeap.pop();
     }
-
-    // Pop top (biggest) 5 from min-heap
-    while (!minHeap.empty()) {
-        topCountries.push_back(minHeap.top().second); // Store the country name
-        minHeap.pop(); // Remove top element
-    }
-
-    // Reverse to get lowest obesity rate first
-    reverse(topCountries.begin(), topCountries.end());
-    cout << "Top 5 (Highest Obesity Rates): ";
-    for (const auto &country : topCountries) {
-        cout << country << ", ";
-    }
-    cout << endl;
-
-    // Pop top (lowest) 5 countries from  max-heap
-    while (!maxHeap.empty()) {
-        bottomCountries.push_back(maxHeap.top().second); // Store the country name
-        maxHeap.pop(); // Remove top element
-    }
-
-    // Reverse to get highest obesity rate first
-    reverse(bottomCountries.begin(), bottomCountries.end());
-    cout << "Bottom 5 (Lowest Obesity Rates): ";
-    for (const auto &country : bottomCountries) {
-        cout << country << ", ";
-    }
-    cout << endl;
-
+  }
+  
+  // Pop top (biggest) 5 from min-heap
+  while (!minHeap.empty()) {
+    topCountries.push_back(minHeap.top().second); // Store the country name
+    minHeap.pop(); // Remove top element
+  }
+  
+  // Reverse to get lowest metric rate first
+  reverse(topCountries.begin(), topCountries.end());
+  cout << "Top 5: ";
+  for (const auto &country : topCountries) {
+    cout << country << ", ";
+  }
+  cout << endl;
+  
+  // Pop top (lowest) 5 countries from  max-heap
+  while (!maxHeap.empty()) {
+    bottomCountries.push_back(maxHeap.top().second); // Store the country name
+    maxHeap.pop(); // Remove top element
+  }
+  
+  // Reverse to get highest metric rate first
+  reverse(bottomCountries.begin(), bottomCountries.end());
+  cout << "Bottom 5: ";
+  for (const auto &country : bottomCountries) {
+    cout << country << ", ";
+  }
+  cout << endl;
+  
 }
 
 
@@ -352,7 +353,7 @@ void makeBP(const map<string, vector<double>> &countryData, vector<string> &coun
 
 // Create grouped bar charts
 void makeGroupedBarCharts(const map<string, vector<double>> &countryData, vector<string> &topCountries,
-                          vector<string> &bottomCountries, const map<string, int> &columnIndices) {
+                          vector<string> &bottomCountries, const map<string, int> &columnIndices, string metric) {
 
     
     // Food categories to plot
@@ -382,14 +383,14 @@ void makeGroupedBarCharts(const map<string, vector<double>> &countryData, vector
     }
 
     // Print out info about food groups by country
-    /*cout << "TOP COUNTRIES" << endl;
+    cout << "TOP COUNTRIES by " << metric << endl;
     for (size_t i=0; i < 5; i++){
         cout << topCountries[i] << ": " << endl;
         for (size_t j=0; j < 5; j++){
-            cout << foodGroups[j] << ": " << topBarData_DISPLAY[i][j]<< endl;
+            cout << foodGroups[j] << ": " << topBarData_DISPLAY[i][j]<< ", ";
         }
         cout << endl;
-    } */
+    } 
     
     // Fill in the bar data for the bottom countries (for display in terminal)
     vector<vector<double>> bottomBarData_DISPLAY;
@@ -415,7 +416,7 @@ void makeGroupedBarCharts(const map<string, vector<double>> &countryData, vector
     }
 
     // Print out info about food groups by country
-    cout << "BOTTOM COUNTRIES" << endl;
+    cout << "BOTTOM COUNTRIES by " << metric << endl;
     for (size_t i=0; i < 5; i++){
         cout << bottomCountries[i] << ": " << endl;
         for (size_t j=0; j < 5; j++){
@@ -436,12 +437,13 @@ void makeGroupedBarCharts(const map<string, vector<double>> &countryData, vector
 
     // Adjust plot for top countries
     xticklabels(topCountries); // Set x-tick labels to the country names
-    title("Countries with Highest Obesity Rates");
+    title("Countries with Highest Rates");
     xlabel("Countries");
     ylabel("Supply (kcal/person/day)");
     //matplot::legend(foodGroups); // Legend for food groups
     show();
-    save("GBP-TopCountries.png");
+    string filelabel = "GBP-TopCountries-" + metric + ".png";
+    save(filelabel);
 
     // Plot the bottom countries' bar data (stacked/grouped)
     fig = figure();
@@ -449,12 +451,13 @@ void makeGroupedBarCharts(const map<string, vector<double>> &countryData, vector
 
     // Adjust plot for bottom countries
     xticklabels(bottomCountries); // Set x-tick labels to the country names
-    title("Countries with Lowest Obesity Rates");
+    title("Countries with Lowest Rates");
     xlabel("Countries");
     ylabel("Supply (kcal/person/day)");
     //matplot::legend(foodGroups); // Legend for food groups
     show();
-    save("GBP-BottomCountries.png");
+    filelabel = "GBP-BottomCountries-" + metric +".png";
+    save(filelabel);
 
 }
 
@@ -548,9 +551,7 @@ void makeScatterPlots(const map<string, vector<double>> &countryData, const vect
 
 
 
-
-
-
+// --------------------------------------------------------------------------------------------------------------------
 
 
 // Main 
@@ -598,12 +599,19 @@ int main() {
     
     // Subset countries by highest and lowest obesity rate
     vector<string> topCountries, bottomCountries;
-    subsetCountries(countryData, countryNames, columnIndices, topCountries, bottomCountries);
+    subsetCountries(countryData, countryNames, columnIndices, topCountries, bottomCountries, "Obesity");
     
     // Make Bar Plot
     makeBP(countryData, countryNames, columnNames, columnIndices, topCountries, bottomCountries);
+
+    // Subset countries by highest and lowest COVID rate
+    vector<string> topCOVID, bottomCOVID;
+    subsetCountries(countryData, countryNames, columnIndices, topCOVID, bottomCOVID, "Confirmed");
+    
+
     // Make Grouped Bar Charts
-    makeGroupedBarCharts(countryData, topCountries, bottomCountries, columnIndices);
+    makeGroupedBarCharts(countryData, topCountries, bottomCountries, columnIndices, "Obesity");
+    makeGroupedBarCharts(countryData, topCOVID, bottomCOVID, columnIndices, "Confirmed");
     
     // Make Scatter Plots
     makeScatterPlots(countryData, countryNames, foodGroups, columnIndices);
